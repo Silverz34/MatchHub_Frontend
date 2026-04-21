@@ -13,6 +13,7 @@ import {
   UserPlus, 
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 // Cambiamos 'emoji' por 'Icon'
 const players = [
@@ -74,11 +75,11 @@ export default function MatchHubLanding() {
     <>
       {/* NAV */}
       <nav className="nav">
-        <a href="#" className="nav-logo">
+        <div className="nav-logo">
           <Image src="/mathub.png" alt="MatchHub" className="logo-img" width={40} height={40} />
-        </a>
-      
-        <a href="#cta" className="nav-cta">Empezar gratis</a>
+        </div>
+
+        <Link href="/register" className="nav-cta">Empezar gratis</Link>
       </nav>
 
       {/* HERO */}
@@ -96,8 +97,8 @@ export default function MatchHubLanding() {
               MatchHub conecta jugadores compatibles en tiempo real. Algoritmo inteligente, jugadores cercanos, cero buscar en Discord.
             </p>
             <div className="hero-actions">
-              <a href="#cta" className="btn-primary">Crear mi perfil</a>
-              <a href="#como" className="btn-secondary">Ver cómo funciona →</a>
+              <Link href="/register" className="btn-primary">Crear Cuenta</Link>
+              <Link href="/login" className="btn-secondary">Iniciar ahora</Link>
             </div>
             <div className="hero-stats">
               <div>
