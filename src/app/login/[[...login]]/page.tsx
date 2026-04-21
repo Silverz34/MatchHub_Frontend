@@ -5,7 +5,6 @@ import Image from "next/image";
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#0F0F11] flex flex-col items-center justify-center p-4 font-sans text-white">
-      {/* Header / Logo */}
       <div className="mb-8 flex flex-col items-center">
        <div className="nav-logo">
           <Image src="/mathub.png" alt="MatchHub" className="logo-img" width={40} height={40} />
@@ -31,6 +30,7 @@ export default function LoginPage() {
           }
         }}
         signUpUrl="/register"
+        fallbackRedirectUrl="/perfil"
       />
 
       <div className="mt-8 text-[10px] text-gray-500 uppercase tracking-widest">

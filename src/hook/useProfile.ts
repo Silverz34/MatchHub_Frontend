@@ -1,48 +1,84 @@
-// src/hooks/useProfile.ts
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ProfileService } from "@/service/service";
 import { Avatar } from "@/interfaces/avatar";
 import { Profile } from "@/interfaces/profile";
 
+export const PREFERENCES_LIST = [
+  "Competitivo", "Casual", "Comunicativo", "Estratégico",
+  "Agresivo", "Defensivo", "Flexible", "Paciente",
+  "Serio", "Divertido", "Nocturno", "Social"
+];
+
+export const DAYS_LIST = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 export function useProfile() {
   const router = useRouter();
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [availableGames, setAvailableGames] = useState<string[]>([]);
-  
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [selectedGames, setSelectedGames] = useState<string[]>([]);
+  const [bio, setBio] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [region, setRegion] = useState("");
   
+
+  const [preferences, setPreferences] = useState<string[]>([]);
+
+  const [availability, setAvailability] = useState<Record<string, { active: boolean; start: string; end: string }>>(
+    DAYS_LIST.reduce((acc, day) => ({ ...acc, [day]: { active: false, start: "", end: "" } }), {})
+  );
+
+
+  const [customGame, setCustomGame] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
+    const loadData = async () => {
       try {
-        const catalog = ProfileService.getAvatarCatalog();
-        const games = await ProfileService.getAvailableGames();
-        
-        setAvatars(catalog);
-        setAvailableGames(games);
-        setSelectedAvatar(catalog[0]?.url || ""); 
+        setAvatars(ProfileService.getAvatarCatalog());
+        setAvailableGames(await ProfileService.getAvailableGames());
+        setSelectedAvatar(ProfileService.getAvatarCatalog()[0]?.url || ""); 
       } catch (error) {
-        console.error("Error cargando catálogos", error);
+        console.error("Error", error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    loadInitialData();
+    loadData();
   }, []);
 
   const toggleGame = (juego: string) => {
-    if (selectedGames.includes(juego)) {
-      setSelectedGames(selectedGames.filter(g => g !== juego));
-    } else {
-      setSelectedGames([...selectedGames, juego]);
+    setSelectedGames(prev => prev.includes(juego) ? prev.filter(g => g !== juego) : [...prev, juego]);
+  };
+
+  const addCustomGame = () => {
+    if (customGame.trim() && !selectedGames.includes(customGame)) {
+      setSelectedGames([...selectedGames, customGame.trim()]);
+      setCustomGame(""); // Limpiamos el input
     }
+  };
+
+  const togglePreference = (pref: string) => {
+    setPreferences(prev => prev.includes(pref) ? prev.filter(p => p !== pref) : [...prev, pref]);
+  };
+
+  const toggleDay = (day: string) => {
+    setAvailability(prev => ({
+      ...prev,
+      [day]: { ...prev[day], active: !prev[day].active }
+    }));
+  };
+
+  const updateTime = (day: string, field: "start" | "end", value: string) => {
+    setAvailability(prev => ({
+      ...prev,
+      [day]: { ...prev[day], [field]: value }
+    }));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -50,30 +86,23 @@ export function useProfile() {
     setIsSaving(true);
     
     try {
-      const payload: Profile = {
+      const payload: Profile= {
         avatarUrl: selectedAvatar,
-        games: selectedGames.join(', '),
+        games: selectedGames,
+        bio, discord, platform, region, preferences, availability
       };
-
       await ProfileService.updateProfile(payload);
-      
       router.push("/inicio");
-    } catch (error) {
-      console.error("Falló el guardado", error);
     } finally {
       setIsSaving(false);
     }
   };
 
   return {
-    avatars,
-    availableGames,
-    selectedAvatar,
-    setSelectedAvatar,
-    selectedGames,
-    toggleGame,
-    isLoading,
-    isSaving,
-    handleSave
+    avatars, availableGames, selectedAvatar, setSelectedAvatar,
+    selectedGames, toggleGame, customGame, setCustomGame, addCustomGame,
+    bio, setBio, discord, setDiscord, platform, setPlatform, region, setRegion,
+    preferences, togglePreference, availability, toggleDay, updateTime,
+    isLoading, isSaving, handleSave, router
   };
 }
