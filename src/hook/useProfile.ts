@@ -1,72 +1,99 @@
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ProfileService } from "@/service/service";
-import { Avatar } from "@/interfaces/avatar";
-import { Profile } from "@/interfaces/profile";
+import { useApi } from "@/lib/apiClient";
+import { ProfileService } from "@/service/profile";
+import { Game, Preference, AvatarOption } from "../interfaces/interfaces";
 
-export const PREFERENCES_LIST = [
-  "Competitivo", "Casual", "Comunicativo", "Estratégico",
-  "Agresivo", "Defensivo", "Flexible", "Paciente",
-  "Serio", "Divertido", "Nocturno", "Social"
-];
-
-export const DAYS_LIST = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+// Usamos tu lista de días para inicializar el estado
+const DAYS_LIST = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 export function useProfile() {
   const router = useRouter();
-  const [avatars, setAvatars] = useState<Avatar[]>([]);
-  const [availableGames, setAvailableGames] = useState<string[]>([]);
+  const { getClient } = useApi();
+
+  const [avatars, setAvatars] = useState<AvatarOption[]>([]);
+  const [availableGames, setAvailableGames] = useState<Game[]>([]);
+  const [availablePrefs, setAvailablePrefs] = useState<Preference[]>([]);
+  
+  // Estados de Selección (IDs)
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
-  const [selectedGames, setSelectedGames] = useState<string[]>([]);
+  const [selectedGames, setSelectedGames] = useState<number[]>([]);
+  const [selectedPrefs, setSelectedPrefs] = useState<number[]>([]);
+  
+  // Estados de Texto
   const [bio, setBio] = useState("");
   const [discord, setDiscord] = useState("");
   const [platform, setPlatform] = useState("");
   const [region, setRegion] = useState("");
-  
+  const [customGame, setCustomGame] = useState("");
 
-  const [preferences, setPreferences] = useState<string[]>([]);
-
+  //Estado de Disponibilidad (Diccionario)
   const [availability, setAvailability] = useState<Record<string, { active: boolean; start: string; end: string }>>(
     DAYS_LIST.reduce((acc, day) => ({ ...acc, [day]: { active: false, start: "", end: "" } }), {})
   );
 
-
-  const [customGame, setCustomGame] = useState("");
-
+  //Estados de Carga
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Cargar datos iniciales
   useEffect(() => {
-    const loadData = async () => {
+    async function loadData() {
       try {
-        setAvatars(ProfileService.getAvatarCatalog());
-        setAvailableGames(await ProfileService.getAvailableGames());
-        setSelectedAvatar(ProfileService.getAvatarCatalog()[0]?.url || ""); 
+        const api = await getClient();
+        
+        const [games, prefs, avatarData] = await Promise.all([
+          ProfileService.getAvailableGames(api),
+          ProfileService.getAvailablePreferences(api),
+          ProfileService.getAvatars(api)
+        ]);
+
+        setAvailableGames(games);
+        setAvailablePrefs(prefs);
+        setAvatars(avatarData.avatars);
+        
+        if (avatarData.avatars.length > 0) {
+          setSelectedAvatar(avatarData.avatars[0].url);
+        }
       } catch (error) {
-        console.error("Error", error);
+        console.error("Error al sincronizar catálogos:", error);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
     loadData();
-  }, []);
+  }, [getClient]);
 
-  const toggleGame = (juego: string) => {
-    setSelectedGames(prev => prev.includes(juego) ? prev.filter(g => g !== juego) : [...prev, juego]);
+  // Manejadores de Toggles
+  const toggleGame = (id: number) => {
+    setSelectedGames(prev => 
+      prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]
+    );
   };
 
+  const togglePreference = (id: number) => {
+    setSelectedPrefs(prev => 
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  // Agregar juego personalizado 
   const addCustomGame = () => {
-    if (customGame.trim() && !selectedGames.includes(customGame)) {
-      setSelectedGames([...selectedGames, customGame.trim()]);
-      setCustomGame(""); // Limpiamos el input
+    if (customGame.trim() !== "") {
+      const tempId = Date.now(); // Creamos un ID temporal numérico
+      const newGame: Game = {
+        id: tempId,
+        nombre: customGame.trim(),
+        plataformas: [],
+        origen: "custom"
+      };
+      setAvailableGames(prev => [...prev, newGame]);
+      setSelectedGames(prev => [...prev, tempId]);
+      setCustomGame("");
     }
   };
 
-  const togglePreference = (pref: string) => {
-    setPreferences(prev => prev.includes(pref) ? prev.filter(p => p !== pref) : [...prev, pref]);
-  };
-
+  // Manejadores de Disponibilidad
   const toggleDay = (day: string) => {
     setAvailability(prev => ({
       ...prev,
@@ -81,28 +108,60 @@ export function useProfile() {
     }));
   };
 
+  // Función Principal de Guardado
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     
     try {
-      const payload: Profile= {
-        avatarUrl: selectedAvatar,
-        games: selectedGames,
-        bio, discord, platform, region, preferences, availability
+      const api = await getClient();
+
+      // Mapeamos los días a números como pide tu BD (0=Domingo, 1=Lunes...)
+      const mapDiasNombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      
+      const disponibilidadArray = Object.entries(availability)
+        .filter(([_, data]) => data.active)
+        .map(([dia, data]) => ({
+          dia_semana: mapDiasNombres.indexOf(dia),
+          hora_inicio: data.start,
+          hora_fin: data.end
+        }));
+
+      // Armamos el payload exacto para la API
+      const payload = {
+        avatar_url: selectedAvatar,
+        videojuego_ids: selectedGames,
+        preferencia_ids: selectedPrefs,
+        descripcion: bio,
+        discord_id: discord,
+        plataformas: platform ? [platform.toLowerCase()] : [], 
+        region: region.toLowerCase(),
+        disponibilidad: disponibilidadArray
       };
-      await ProfileService.updateProfile(payload);
+
+      await ProfileService.updateProfile(api, payload);
+      
       router.push("/inicio");
+    } catch (error) {
+      console.error("Error al guardar el perfil:", error);
     } finally {
       setIsSaving(false);
     }
   };
 
   return {
-    avatars, availableGames, selectedAvatar, setSelectedAvatar,
-    selectedGames, toggleGame, customGame, setCustomGame, addCustomGame,
-    bio, setBio, discord, setDiscord, platform, setPlatform, region, setRegion,
-    preferences, togglePreference, availability, toggleDay, updateTime,
+    avatars,
+    availableGames,
+    availablePrefs,
+    selectedAvatar, setSelectedAvatar,
+    selectedGames, toggleGame,
+    customGame, setCustomGame, addCustomGame,
+    bio, setBio, 
+    discord, setDiscord, 
+    platform, setPlatform, 
+    region, setRegion,
+    selectedPrefs, togglePreference, 
+    availability, toggleDay, updateTime,
     isLoading, isSaving, handleSave, router
   };
 }
