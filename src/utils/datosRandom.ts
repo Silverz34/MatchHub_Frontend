@@ -1,4 +1,4 @@
-// src/services/match.service.ts
+
 import { Players } from "@/interfaces/player";
 
 export const MatchService = {
@@ -47,5 +47,24 @@ export const MatchService = {
         preferences: ["Casual", "Divertido"]
       }
     ];
+  },
+
+  getPlayerById: async (id: string) => {
+    // Simulamos una consulta a la base de datos
+    const players = await MatchService.getFeaturedPlayers();
+    const player = players.find(p => p.id === id);
+
+    if (!player) throw new Error("Jugador no encontrado");
+
+    // Simulamos que la base de datos nos devuelve su disponibilidad completa
+    return {
+      ...player,
+      bio: player.bio || "Buscando equipo para jugar y pasar el rato. Dispuesto a aprender y mejorar.",
+      availability: {
+        "Lunes": { active: true, start: "19:00", end: "23:00" },
+        "Miércoles": { active: true, start: "18:00", end: "22:00" },
+        "Sábado": { active: true, start: "14:00", end: "18:00" }
+      }
+    };
   }
 };
