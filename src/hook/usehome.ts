@@ -1,4 +1,4 @@
-// src/hooks/useHome.ts
+
 import { useState, useEffect } from "react";
 import { MatchService } from "@/utils/datosRandom";
 import { Players } from "@/interfaces/player";

@@ -22,21 +22,20 @@ export default function InicioPage() {
     <div className="min-h-screen bg-[#0F0F11] text-white p-6 md:p-10">
       
       {/* Header de Bienvenida */}
-      <header className="flex justify-between items-end mb-10 pt-10">
-            <div>
+      <header className="flex justify-between items-end pt-10">
+          <div>
             <h1 className="text-4xl font-black tracking-tight mb-2">
-                Hola, { displayName || "ProGamer"}
+              Hola, { displayName || "ProGamer"}
             </h1>
-            <p className="text-gray-400">Estos jugadores podrían ser tu próximo squad</p>
-            </div>
-            <button className="bg-[#00C2FF] hover:bg-[#00A3D9] text-black font-bold py-2.5 px-6 rounded-full text-sm transition-all shadow-[0_0_20px_rgba(0,194,224,0.3)]">
-            Buscar más
-            </button>
+            <p className="text-white">Estos jugadores podrían ser tu próximo squad</p>
+          </div>
       </header>
 
       {/* Sección de Estadísticas Rápidas */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-            <div className="bg-[#161618] border-2 border-[#00C2FF] rounded-3xl p-8 relative overflow-hidden group flex flex-col justify-between h-full shadow-[0_0_15px_rgba(0,194,224,0.15)]">
+            <div className="bg-[#161618] border-2 border-[#00C2FF] 
+            rounded-3xl p-8 relative overflow-hidden group flex flex-col justify-between 
+            h-full shadow-[0_0_15px_rgba(0,194,224,0.15)]">
                 <div className="relative z-10">
                 <h2 className="text-7xl font-black text-[#00C2FF] mb-2 tracking-tighter">6</h2>
                 <h3 className="text-xl font-bold mb-1">Nuevas conexiones</h3>
@@ -81,7 +80,7 @@ export default function InicioPage() {
         </section>
 
       {/* Título de la Cuadrícula */}
-      <div className="mb-8">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold inline-block border-b-4 border-[#FF6B00] pb-2">
           Jugadores destacados
         </h2>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { SlidersHorizontal, X, Loader2 } from 'lucide-react';
 import { PREFERENCES_LIST } from '@/hook/useProfile';
 import { DAYS_LIST } from '@/hook/useProfile';

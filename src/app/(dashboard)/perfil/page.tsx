@@ -176,7 +176,8 @@ export default function PerfilPage() {
             
             <button 
               type="submit" disabled={isSaving}
-              className="bg-linear-to-r from-[#00C2FF] to-[#FF6B00] hover:opacity-90 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg flex items-center gap-2"
+              className="bg-[#FF6B00] text-white shadow-[0_0_15px_rgba(255,107,0,0.3)] border border-[#FF6B00] 
+              hover:opacity-90 disabled:opacity-50 font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
             >
               {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
               {isSaving ? "Guardando..." : "Guardar Cambios"}
