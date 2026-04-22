@@ -1,16 +1,22 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
 import { Loader2, Plus, X, Save } from "lucide-react";
-import { useProfile, PREFERENCES_LIST, DAYS_LIST } from "@/hook/useProfile";
+import { useProfile } from "@/hook/useProfile";
+import { DAYS_LIST } from "../../../utils/modojuego";
 
 export default function PerfilPage() {
   const { user, isLoaded: isUserLoaded } = useUser();
   
   const {
-    avatars, availableGames, selectedAvatar, setSelectedAvatar,
-    selectedGames, toggleGame, customGame, setCustomGame, addCustomGame,
+    avatars, 
+    availableGames, 
+    availablePrefs, // <-- Agregamos las preferencias que vienen de la BD
+    selectedAvatar, setSelectedAvatar,
+    selectedGames, toggleGame, 
+    customGame, setCustomGame, addCustomGame,
     bio, setBio, discord, setDiscord, platform, setPlatform, region, setRegion,
-    preferences, togglePreference, availability, toggleDay, updateTime,
+    selectedPrefs, togglePreference, 
+    availability, toggleDay, updateTime,
     isLoading, isSaving, handleSave, router
   } = useProfile();
 
@@ -18,7 +24,6 @@ export default function PerfilPage() {
     return <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center text-white"><Loader2 className="animate-spin" size={48} /></div>;
   }
 
- 
   const displayName = user?.username || user?.firstName || "Jugador";
   const displayEmail = user?.primaryEmailAddress?.emailAddress || "Sin correo vinculado";
 
@@ -42,7 +47,6 @@ export default function PerfilPage() {
               <img src={selectedAvatar} alt="Avatar" className="w-full h-full object-contain" />
             </div>
             <div>
-              {/* Mostramos los datos de Clerk aquí */}
               <h3 className="text-2xl font-bold">{displayName}</h3>
               <p className="text-gray-400">{displayEmail}</p>
             </div>
@@ -52,9 +56,10 @@ export default function PerfilPage() {
           <div className="mb-10">
             <h4 className="border-l-4 border-[#00C2FF] pl-3 font-bold mb-4">Selecciona tu avatar</h4>
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 bg-[#0F0F11] border border-[#2A2A2D] rounded-xl p-6">
-              {avatars.map((avatar) => (
+              {avatars.map((avatar, index) => (
                 <button
-                  key={avatar.id} type="button" onClick={() => setSelectedAvatar(avatar.url)}
+                  key={avatar.url || index} // Usamos la URL o el índice en lugar de avatar.id que ya no existe
+                  type="button" onClick={() => setSelectedAvatar(avatar.url)}
                   className={`aspect-square p-2 rounded-lg border transition-all ${
                     selectedAvatar === avatar.url ? 'border-[#00C2FF] bg-[#00C2FF]/10 ring-2 ring-[#00C2FF]/50' : 'border-[#2A2A2D] hover:border-gray-500 hover:bg-[#161618]'
                   }`}
@@ -95,13 +100,18 @@ export default function PerfilPage() {
           <div className="mb-10">
             <h4 className="border-l-4 border-[#00C2FF] pl-3 font-bold mb-4">Juegos</h4>
             <div className="flex flex-wrap gap-3 mb-4">
-              {availableGames.map(juego => (
-                <button key={juego} type="button" onClick={() => toggleGame(juego)}
+              {availableGames.map(game => (
+                <button 
+                  key={game.id} // Ahora usamos el ID
+                  type="button" 
+                  onClick={() => toggleGame(game.id)} // Pasamos el ID al hacer clic
                   className={`px-5 py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                    selectedGames.includes(juego) ? 'bg-[#00C2FF] border-[#00C2FF] text-black shadow-[0_0_15px_rgba(0,194,224,0.3)]' : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
+                    selectedGames.includes(game.id) // Validamos con el ID
+                      ? 'bg-[#00C2FF] border-[#00C2FF] text-black shadow-[0_0_15px_rgba(0,194,224,0.3)]' 
+                      : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
                   }`}
                 >
-                  {juego}
+                  {game.nombre} {/* Mostramos la propiedad "nombre" */}
                 </button>
               ))}
             </div>
@@ -120,17 +130,22 @@ export default function PerfilPage() {
             </div>
           </div>
 
-          {/* PREFERENCIAS */}
+          {/* PREFERENCIAS (AHORA DESDE LA API) */}
           <div className="mb-10">
             <h4 className="border-l-4 border-[#FF6B00] pl-3 font-bold mb-4">Preferencias</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {PREFERENCES_LIST.map(pref => (
-                <button key={pref} type="button" onClick={() => togglePreference(pref)}
+              {availablePrefs.map(pref => (
+                <button 
+                  key={pref.id} // Usamos el ID de la base de datos
+                  type="button" 
+                  onClick={() => togglePreference(pref.id)}
                   className={`py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                    preferences.includes(pref) ? 'bg-[#FF6B00] border-[#FF6B00] text-white shadow-[0_0_15px_rgba(255,107,0,0.3)]' : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
+                    selectedPrefs.includes(pref.id) // Validamos por ID
+                      ? 'bg-[#FF6B00] border-[#FF6B00] text-white shadow-[0_0_15px_rgba(255,107,0,0.3)]' 
+                      : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
                   }`}
                 >
-                  {pref}
+                  {pref.nombre} {/* Imprimimos el nombre de la preferencia */}
                 </button>
               ))}
             </div>
@@ -141,7 +156,7 @@ export default function PerfilPage() {
             <h4 className="border-l-4 border-[#eab308] pl-3 font-bold mb-4">Disponibilidad</h4>
             <div className="flex flex-col gap-3">
               {DAYS_LIST.map(day => {
-                const isActive = availability[day].active;
+                const isActive = availability[day]?.active || false;
                 return (
                   <div key={day} className="flex flex-col sm:flex-row items-center gap-4">
                     <button type="button" onClick={() => toggleDay(day)}
@@ -153,12 +168,12 @@ export default function PerfilPage() {
                     </button>
                     <div className={`flex items-center gap-2 transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
                       <input 
-                        type="time" value={availability[day].start} onChange={e => updateTime(day, 'start', e.target.value)}
+                        type="time" value={availability[day]?.start || ""} onChange={e => updateTime(day, 'start', e.target.value)}
                         className="bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00C2FF] color-scheme-dark"
                       />
                       <span className="text-gray-500">-</span>
                       <input 
-                        type="time" value={availability[day].end} onChange={e => updateTime(day, 'end', e.target.value)}
+                        type="time" value={availability[day]?.end || ""} onChange={e => updateTime(day, 'end', e.target.value)}
                         className="bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#00C2FF] color-scheme-dark"
                       />
                     </div>

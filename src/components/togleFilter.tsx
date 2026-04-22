@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { SlidersHorizontal, X, Loader2 } from 'lucide-react';
-import { PREFERENCES_LIST } from '@/hook/useProfile';
-import { DAYS_LIST } from '@/hook/useProfile';
+import { PREFERENCES_LIST, DAYS_LIST } from '@/utils/modojuego';
+
 
 interface FilterDropdownProps {
   availableGames: string[];
