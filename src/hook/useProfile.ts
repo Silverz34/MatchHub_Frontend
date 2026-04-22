@@ -115,8 +115,6 @@ export function useProfile() {
     
     try {
       const api = await getClient();
-
-      // Mapeamos los días a números como pide tu BD (0=Domingo, 1=Lunes...)
       const mapDiasNombres = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
       
       const disponibilidadArray = Object.entries(availability)
