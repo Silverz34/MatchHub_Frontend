@@ -13,3 +13,15 @@ export const PlayerSchema = z.object({
 
 
 export type Players = z.infer<typeof PlayerSchema>;
+
+export const JugadorSchema = z.object({
+    id : z.number(),
+    username: z.string(),
+    email: z.string(),
+    avatar_url: z.string(),
+    estilo_juego: z.string(),
+    region : z.string(),
+    estado: z.string(),
+})
+
+export type jugador = z.infer<typeof JugadorSchema>;

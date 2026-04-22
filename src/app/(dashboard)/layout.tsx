@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar";
+import AuthGuard from "@/components/authGuard";
 
 export default function DashboardLayout({
   children,
@@ -6,12 +7,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar /> 
-      <main className="flex-1">
-        {children}
-      </main>
-      {/* Aquí podrías poner un Footer si lo necesitaras después */}
-    </div>
+    <AuthGuard>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-1">{children}</main>
+      </div>
+    </AuthGuard>
   );
 }
