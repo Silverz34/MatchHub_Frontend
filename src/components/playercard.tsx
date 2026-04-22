@@ -38,14 +38,12 @@ export default function PlayerCard({ player, isFeatured = false }: PlayerCardCom
           {player.bio}
         </p>
       )}
-
-      {/* Este div empuja los tags hacia abajo para que todas las tarjetas se alineen igual */}
       <div className ="grow"></div>
 
-      {/* Etiquetas (Tags) */}
+      {/* Etiquetas*/}
       <div className="space-y-3 mt-4">
         
-        {/* Juegos (Cyan) */}
+        {/* Juegos*/}
         <div className="flex flex-wrap gap-2">
           {player.games.map((game, idx) => (
             <span key={idx} className="px-2.5 py-1 bg-[#00C2FF] text-black text-[10px] font-bold rounded-md">
