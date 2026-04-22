@@ -10,7 +10,7 @@ export default function PerfilPage() {
   const {
     avatars, 
     availableGames, 
-    availablePrefs, // <-- Agregamos las preferencias que vienen de la BD
+    availablePrefs, 
     selectedAvatar, setSelectedAvatar,
     selectedGames, toggleGame, 
     customGame, setCustomGame, addCustomGame,

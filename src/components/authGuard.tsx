@@ -2,6 +2,7 @@
 
 import { useAuthSync } from "@/hook/useAuthSync";
 import { Loader2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -9,8 +10,8 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { status, error } = useAuthSync();
+  const pathname = usePathname(); 
 
-  // Mientras sincronizamos, bloqueamos el render del contenido
   if (status === "idle" || status === "syncing") {
     return (
       <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center">
@@ -35,7 +36,14 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
+  //LA CORRECCIÓN DE LA TRAMPA INFINITA
   if (status === "incomplete") {
+    // Si ya lo mandamos a /perfil, ¡déjalo ver la página!
+    if (pathname === "/perfil") {
+      return <>{children}</>;
+    }
+    
+    // Si intenta ir a /inicio a escondidas, bloquéalo con el spinner Naranja
     return (
       <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#FF6B00]" size={48} />
