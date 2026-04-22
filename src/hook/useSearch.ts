@@ -13,6 +13,7 @@ export function useSearch() {
 
   const [selectedGames, setSelectedGames] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchSearchData() {
@@ -42,18 +43,20 @@ export function useSearch() {
     fetchSearchData();
   }, []);
 
-  const toggleFilter = (filter: string, type: 'game' | 'style') => {
-    if (type === 'game') {
-      setSelectedGames(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
-    } else {
-      setSelectedStyles(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
-    }
-  };
+  const toggleFilter = (filter: string, type: 'game' | 'style' | 'day') => {
+        if (type === 'game') {
+        setSelectedGames(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
+        } else if (type === 'style') {
+        setSelectedStyles(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
+        } else {
+        setSelectedDays(prev => prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]);
+        }
+    };
 
   return { 
     searchQuery, setSearchQuery, 
     players, isLoading,
-    availableGames, 
+    availableGames, selectedDays,
     selectedGames, selectedStyles, toggleFilter
   };
 }

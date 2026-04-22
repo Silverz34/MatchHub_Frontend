@@ -270,9 +270,6 @@
   }
 }
 
-/* =========================================
-   ANIMACIONES Y MEDIA QUERIES (FUERA DE LAS CAPAS)
-   ========================================= */
 
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -293,4 +290,23 @@
   .players-grid { grid-template-columns: 1fr; }
   .hero { padding: 100px 20px 60px; }
   .hero-stats { gap: 24px; }
+}
+
+*::-webkit-scrollbar {
+  width: 0.25rem;
+  height: 0.125rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #e06625;
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #f0653b;
 }
