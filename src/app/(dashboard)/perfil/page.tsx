@@ -1,25 +1,25 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import { Loader2, X, Save } from "lucide-react";
+import { Loader2, X, Save, AlertCircle} from "lucide-react";
 import { useProfile } from "@/hook/perfil/useProfile"; 
-import { DAYS_LIST } from "../../../utils/modojuego";
+import { DAYS_LIST, PLATFORM_OPTIONS} from "../../../utils/modojuego";
 
 export default function PerfilPage() {
   const { user, isLoaded: isUserLoaded } = useUser();
   const {
-    avatars, 
-    availableGames, 
-    availablePrefs, 
+     avatars,
+    availableGames,
+    availablePrefs,
     selectedAvatar, setSelectedAvatar,
-    selectedGames, toggleGame, 
-    bio, setBio, 
-    discord, setDiscord, 
-    platform, setPlatform, 
+    selectedGames,  toggleGame,
+    bio, setBio,
+    discord, setDiscord,
+    platform, setPlatform,
     region, setRegion,
-    estiloJuego, setEstiloJuego, 
-    selectedPrefs, togglePreference, 
+    estiloJuego, setEstiloJuego,
+    selectedPrefs, togglePreference,
     availability, toggleDay, updateTime,
-    isLoading, isSaving, handleSave, router
+    isLoading, isSaving, saveError, handleSave, router,
   } = useProfile();
 
   if (isLoading || !isUserLoaded) {
@@ -47,7 +47,13 @@ export default function PerfilPage() {
       <div className="max-w-4xl mx-auto -mt-16 px-4">
         
         <form onSubmit={handleSave} className="bg-[#161618] border border-[#2A2A2D] rounded-2xl p-8 shadow-2xl">
-          
+          {saveError && (
+            <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-red-400">
+              <AlertCircle size={18} className="shrink-0" />
+              <p className="text-sm font-medium">{saveError}</p>
+            </div>
+          )}
+ 
           {/* INFO CLERK */}
           <div className="flex items-center gap-6 mb-8 border-b border-[#2A2A2D] pb-8">
             <div className="w-24 h-24 bg-[#0F0F11] border border-[#2A2A2D] rounded-2xl p-2 shrink-0">
@@ -101,8 +107,18 @@ export default function PerfilPage() {
                border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
             </div>
             <div>
-              <label className="block font-bold text-sm mb-2">Plataformas</label>
-              <input value={platform} onChange={e => setPlatform(e.target.value)} type="text" placeholder="Ej: PC, PS5, Xbox" className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
+              <label className="block font-bold text-sm mb-2">Plataforma</label>
+              <select
+                value={platform}
+                onChange={e => setPlatform(e.target.value as typeof platform)}
+                className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF] text-white appearance-none cursor-pointer"
+              >
+                {PLATFORM_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
             {/* SELECT PARA REGIÓN (ENUM DB) */}
             <div>

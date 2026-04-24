@@ -5,3 +5,13 @@ export const PREFERENCES_LIST = [
 ];
 
 export const DAYS_LIST = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+export type PlatformValue = "pc" | "ps" | "xbox" | "switch" | "mobile";
+
+export const PLATFORM_OPTIONS: { value: PlatformValue; label: string }[] = [
+  { value: "pc",     label: "PC" },
+  { value: "ps",     label: "PlayStation (PS4 / PS5)" },
+  { value: "xbox",   label: "Xbox" },
+  { value: "switch", label: "Nintendo Switch" },
+  { value: "mobile", label: "Mobile (Android / iOS)" },
+];

@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClient } from "@/lib/apiClient";
 import { ProfileService } from "@/service/profile";
-import { DAYS_LIST } from "@/utils/modojuego";
+import { DAYS_LIST, type PlatformValue } from "@/utils/modojuego";
+
 
 export function useProfileForm(getClient: () => Promise<ApiClient>) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Estados del usuario
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
@@ -15,11 +17,11 @@ export function useProfileForm(getClient: () => Promise<ApiClient>) {
   
   const [bio, setBio] = useState("");
   const [discord, setDiscord] = useState("");
-  const [platform, setPlatform] = useState("");
   
   // NUEVO: Estados adaptados a tu base de datos (ENUMs)
   const [region, setRegion] = useState<"norte" | "centro" | "sur">("centro");
   const [estiloJuego, setEstiloJuego] = useState<"casual" | "competitivo">("casual");
+    const [platform,    setPlatform]    = useState<PlatformValue>("pc");
 
   // Disponibilidad
   const [availability, setAvailability] = useState<Record<string, { active: boolean; start: string; end: string }>>(
@@ -35,6 +37,7 @@ export function useProfileForm(getClient: () => Promise<ApiClient>) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setSaveError(null);
     
     try {
       const api = await getClient();
@@ -55,7 +58,7 @@ export function useProfileForm(getClient: () => Promise<ApiClient>) {
         preferencia_ids: selectedPrefs,
         descripcion: bio,
         discord_id: discord,
-        plataformas: platform ? platform.split(',').map(p => p.trim().toLowerCase()) : [], 
+        plataformas: [platform],
         region: region,
         estilo_juego: estiloJuego, 
         disponibilidad: disponibilidadArray
@@ -63,11 +66,11 @@ export function useProfileForm(getClient: () => Promise<ApiClient>) {
 
       await ProfileService.updateProfile(api, payload);
       router.push("/inicio");
-    } catch (error) {
-      console.error("Error al guardar:", error);
-    } finally {
-      setIsSaving(false);
-    }
+    } catch (err) {
+      console.error("[useProfileForm] Error al guardar:", err);
+      setSaveError("No se pudo guardar el perfil. Inténtalo de nuevo.");
+      setIsSaving(false); 
+    } 
   };
 
   return {
@@ -77,6 +80,6 @@ export function useProfileForm(getClient: () => Promise<ApiClient>) {
     bio, setBio, discord, setDiscord, platform, setPlatform,
     region, setRegion, estiloJuego, setEstiloJuego,
     availability, toggleDay, updateTime,
-    isSaving, handleSave, router
+    isSaving, handleSave, router, saveError
   };
 }
