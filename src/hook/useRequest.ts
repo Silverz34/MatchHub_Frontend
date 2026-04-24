@@ -1,4 +1,4 @@
-// src/hooks/useRequests.ts
+
 import { useState, useEffect } from "react";
 import { ConnectionService, ConnectionRequest } from "@/utils/conectionRandom";
 

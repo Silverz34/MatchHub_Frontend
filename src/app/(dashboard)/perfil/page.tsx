@@ -1,27 +1,33 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import { Loader2, Plus, X, Save } from "lucide-react";
-import { useProfile } from "@/hook/useProfile";
+import { Loader2, X, Save } from "lucide-react";
+import { useProfile } from "@/hook/perfil/useProfile"; 
 import { DAYS_LIST } from "../../../utils/modojuego";
 
 export default function PerfilPage() {
   const { user, isLoaded: isUserLoaded } = useUser();
-  
   const {
     avatars, 
     availableGames, 
-    availablePrefs, // <-- Agregamos las preferencias que vienen de la BD
+    availablePrefs, 
     selectedAvatar, setSelectedAvatar,
     selectedGames, toggleGame, 
-    customGame, setCustomGame, addCustomGame,
-    bio, setBio, discord, setDiscord, platform, setPlatform, region, setRegion,
+    bio, setBio, 
+    discord, setDiscord, 
+    platform, setPlatform, 
+    region, setRegion,
+    estiloJuego, setEstiloJuego, 
     selectedPrefs, togglePreference, 
     availability, toggleDay, updateTime,
     isLoading, isSaving, handleSave, router
   } = useProfile();
 
   if (isLoading || !isUserLoaded) {
-    return <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center text-white"><Loader2 className="animate-spin" size={48} /></div>;
+    return (
+      <div className="min-h-screen bg-[#0F0F11] flex items-center justify-center text-white">
+        <Loader2 className="animate-spin text-[#00C2FF]" size={48} />
+      </div>
+    );
   }
 
   const displayName = user?.username || user?.firstName || "Jugador";
@@ -30,10 +36,11 @@ export default function PerfilPage() {
   return (
     <div className="min-h-screen bg-[#0F0F11] text-white font-sans pb-12">
 
+      {/* HEADER */}
       <div className="bg-linear-to-r from-[#FF6B00] to-[#ff984d] pt-12 pb-24 px-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-2">Mi Perfil</h1>
-          <p className="text-white/80">Gestiona tu información</p>
+          <p className="text-white/80">Gestiona tu información para encontrar tu squad ideal</p>
         </div>
       </div>
 
@@ -44,7 +51,12 @@ export default function PerfilPage() {
           {/* INFO CLERK */}
           <div className="flex items-center gap-6 mb-8 border-b border-[#2A2A2D] pb-8">
             <div className="w-24 h-24 bg-[#0F0F11] border border-[#2A2A2D] rounded-2xl p-2 shrink-0">
-              <img src={selectedAvatar} alt="Avatar" className="w-full h-full object-contain" />
+              {/* Fallback visual por si no hay avatar seleccionado todavía */}
+              {selectedAvatar ? (
+                <img src={selectedAvatar} alt="Avatar" className="w-full h-full object-contain rounded-xl" />
+              ) : (
+                <div className="w-full h-full bg-[#2A2A2D] rounded-xl animate-pulse"></div>
+              )}
             </div>
             <div>
               <h3 className="text-2xl font-bold">{displayName}</h3>
@@ -52,14 +64,15 @@ export default function PerfilPage() {
             </div>
           </div>
 
-          {/* AVATARES */}
+          {/* AVATARES (Desde la API de DiceBear) */}
           <div className="mb-10">
             <h4 className="border-l-4 border-[#00C2FF] pl-3 font-bold mb-4">Selecciona tu avatar</h4>
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 bg-[#0F0F11] border border-[#2A2A2D] rounded-xl p-6">
               {avatars.map((avatar, index) => (
                 <button
-                  key={avatar.url || index} // Usamos la URL o el índice en lugar de avatar.id que ya no existe
-                  type="button" onClick={() => setSelectedAvatar(avatar.url)}
+                  key={avatar.url || index}
+                  type="button" 
+                  onClick={() => setSelectedAvatar(avatar.url)}
                   className={`aspect-square p-2 rounded-lg border transition-all ${
                     selectedAvatar === avatar.url ? 'border-[#00C2FF] bg-[#00C2FF]/10 ring-2 ring-[#00C2FF]/50' : 'border-[#2A2A2D] hover:border-gray-500 hover:bg-[#161618]'
                   }`}
@@ -75,77 +88,91 @@ export default function PerfilPage() {
             <h4 className="border-l-4 border-[#00C2FF] pl-3 font-bold mb-4">Biografía</h4>
             <textarea 
               value={bio} onChange={e => setBio(e.target.value)}
-              rows={3} placeholder="Cuéntanos sobre tu estilo de juego..."
+              rows={3} placeholder="Cuéntanos sobre tu experiencia, mains y lo que buscas en un equipo..."
               className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-xl p-4 text-white focus:outline-none focus:border-[#00C2FF] resize-none"
             />
           </div>
 
-          {/* DATOS (Discord, Plataforma, Región) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {/* DATOS (Discord, Plataforma, Región, Estilo) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             <div>
               <label className="block font-bold text-sm mb-2">Discord</label>
-              <input value={discord} onChange={e => setDiscord(e.target.value)} type="text" placeholder="ProGamer#1234" className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
+              <input value={discord} onChange={e => setDiscord(e.target.value)} type="text" placeholder="ProGamer#1234" className="w-full bg-[#0F0F11] border
+               border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
             </div>
             <div>
-              <label className="block font-bold text-sm mb-2">Plataforma</label>
-              <input value={platform} onChange={e => setPlatform(e.target.value)} type="text" placeholder="PC, Xbox, PlayStation..." className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
+              <label className="block font-bold text-sm mb-2">Plataformas</label>
+              <input value={platform} onChange={e => setPlatform(e.target.value)} type="text" placeholder="Ej: PC, PS5, Xbox" className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
             </div>
+            {/* SELECT PARA REGIÓN (ENUM DB) */}
             <div>
               <label className="block font-bold text-sm mb-2">Región</label>
-              <input value={region} onChange={e => setRegion(e.target.value)} type="text" placeholder="Ej. Norteamérica, LAN..." className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" />
+              <select 
+                value={region} 
+                onChange={e => setRegion(e.target.value as "norte" | "centro" | "sur")} 
+                className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF] text-white appearance-none cursor-pointer"
+              >
+                <option value="norte">Norteamérica (LAN/NA)</option>
+                <option value="centro">Centroamérica</option>
+                <option value="sur">Sudamérica (LAS/SA)</option>
+              </select>
+            </div>
+            
+            {/* SELECT PARA ESTILO (ENUM DB) */}
+            <div>
+              <label className="block font-bold text-sm mb-2">Estilo</label>
+              <select 
+                value={estiloJuego} 
+                onChange={e => setEstiloJuego(e.target.value as "casual" | "competitivo")} 
+                className="w-full bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF] text-white appearance-none cursor-pointer"
+              >
+                <option value="casual">Casual (Por diversión)</option>
+                <option value="competitivo">Competitivo (Rankeds)</option>
+              </select>
             </div>
           </div>
 
-          {/* JUEGOS Y CUSTOM INPUT */}
+          {/* JUEGOS (Desde la API) */}
           <div className="mb-10">
             <h4 className="border-l-4 border-[#00C2FF] pl-3 font-bold mb-4">Juegos</h4>
             <div className="flex flex-wrap gap-3 mb-4">
               {availableGames.map(game => (
                 <button 
-                  key={game.id} // Ahora usamos el ID
+                  key={game.id} 
                   type="button" 
-                  onClick={() => toggleGame(game.id)} // Pasamos el ID al hacer clic
+                  onClick={() => toggleGame(game.id)} 
                   className={`px-5 py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                    selectedGames.includes(game.id) // Validamos con el ID
+                    selectedGames.includes(game.id) 
                       ? 'bg-[#00C2FF] border-[#00C2FF] text-black shadow-[0_0_15px_rgba(0,194,224,0.3)]' 
                       : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
                   }`}
                 >
-                  {game.nombre} {/* Mostramos la propiedad "nombre" */}
+                  {game.nombre}
                 </button>
               ))}
             </div>
-            
-            {/* Input agregar juego */}
-            <div className="flex gap-2">
-              <input 
-                value={customGame} onChange={e => setCustomGame(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustomGame())}
-                type="text" placeholder="Agregar otro juego..." 
-                className="flex-1 bg-[#0F0F11] border border-[#2A2A2D] rounded-lg px-4 py-3 focus:outline-none focus:border-[#00C2FF]" 
-              />
-              <button type="button" onClick={addCustomGame} className="bg-[#00C2FF] hover:bg-[#00A3D9] text-black rounded-lg px-4 flex items-center justify-center transition-colors">
-                <Plus size={20} />
-              </button>
-            </div>
+            {/* Si el array está vacío (cargando o falló), mostramos un mensajito */}
+            {availableGames.length === 0 && (
+              <p className="text-sm text-gray-500 italic">No hay juegos disponibles en el catálogo.</p>
+            )}
           </div>
 
-          {/* PREFERENCIAS (AHORA DESDE LA API) */}
+          {/* PREFERENCIAS (Desde la API) */}
           <div className="mb-10">
-            <h4 className="border-l-4 border-[#FF6B00] pl-3 font-bold mb-4">Preferencias</h4>
+            <h4 className="border-l-4 border-[#FF6B00] pl-3 font-bold mb-4">Etiquetas de Estilo</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {availablePrefs.map(pref => (
                 <button 
-                  key={pref.id} // Usamos el ID de la base de datos
+                  key={pref.id} 
                   type="button" 
                   onClick={() => togglePreference(pref.id)}
                   className={`py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                    selectedPrefs.includes(pref.id) // Validamos por ID
+                    selectedPrefs.includes(pref.id) 
                       ? 'bg-[#FF6B00] border-[#FF6B00] text-white shadow-[0_0_15px_rgba(255,107,0,0.3)]' 
                       : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
                   }`}
                 >
-                  {pref.nombre} {/* Imprimimos el nombre de la preferencia */}
+                  {pref.nombre}
                 </button>
               ))}
             </div>
@@ -161,7 +188,7 @@ export default function PerfilPage() {
                   <div key={day} className="flex flex-col sm:flex-row items-center gap-4">
                     <button type="button" onClick={() => toggleDay(day)}
                       className={`w-32 py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                        isActive ? 'bg-[#00C2FF] border-[#00C2FF] text-black shadow-[0_0_15px_rgba(0,194,224,0.3)]' : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
+                        isActive ? 'bg-[#eab308] border-[#eab308] text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'bg-[#0F0F11] border-[#2A2A2D] text-gray-400 hover:border-gray-500'
                       }`}
                     >
                       {day}
