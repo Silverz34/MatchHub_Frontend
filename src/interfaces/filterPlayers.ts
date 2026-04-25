@@ -1,3 +1,4 @@
+
 export interface FilteredPlayer {
   id: number;
   username: string;

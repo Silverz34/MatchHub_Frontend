@@ -21,3 +21,5 @@ export interface CompatiblePlayersResponse {
   limit: number;
   players: CompatiblePlayer[];
 }
+
+
