@@ -1,7 +1,7 @@
 
 import { ApiClient } from "@/lib/apiClient";
 import { Game, Preference, AvatarsResponse} from "../interfaces/interfaces"
-import { Profile } from "@/interfaces/profile";
+import { ProfileResponse } from "@/interfaces/profileMe";
 
 export const ProfileService = {
 
@@ -23,7 +23,7 @@ export const ProfileService = {
     return await api.put("/profile", payload);
   },
 
-  getProfile: async (api: ApiClient): Promise<Profile> => {
-    return await api.get<Profile>("/profile");
+  getProfile: async (api: ApiClient): Promise<ProfileResponse> => {
+    return await api.get<ProfileResponse>("/profile");
   }
 };
