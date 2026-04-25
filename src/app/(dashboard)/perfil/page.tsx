@@ -11,7 +11,7 @@ export default function PerfilViewPage() {
   }
 
   if (!profile) return null;
-  const coverImage = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop";
+  const coverImage = "https://i.pinimg.com/1200x/fa/9c/3b/fa9c3b6d414a556b5840a168ad77bb2d.jpg";
 
   return (
     <div className="min-h-screen bg-[#0F0F11] text-white pb-20">
