@@ -1,8 +1,10 @@
 
 import { ApiClient } from "@/lib/apiClient";
 import { Game, Preference, AvatarsResponse} from "../interfaces/interfaces"
+import { Profile } from "@/interfaces/profile";
 
 export const ProfileService = {
+
   getAvailableGames: async (api: ApiClient): Promise<Game[]> => {
     const response = await api.get<{ games: Game[] }>("/games");
     return response.games;
@@ -19,5 +21,9 @@ export const ProfileService = {
 
   updateProfile: async (api: ApiClient, payload: unknown) => {
     return await api.put("/profile", payload);
+  },
+
+  getProfile: async (api: ApiClient): Promise<Profile> => {
+    return await api.get<Profile>("/profile");
   }
 };
