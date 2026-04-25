@@ -1,6 +1,6 @@
-import { FilteredPlayer } from "@/interfaces/filterPlayers";
+import { CompatiblePlayer } from "@/interfaces/dashboard";
 
-export default function SearchPlayerCard({ player }: { player: FilteredPlayer }) {
+export default function SearchPlayerCard({ player }: { player: CompatiblePlayer }) {
  return (
     <div className="bg-[#161618] border border-[#2A2A2D] rounded-2xl p-6 transition-all duration-300 hover:border-[#00C2FF] flex flex-col sm:flex-row justify-between gap-6">
       <div className="grow">

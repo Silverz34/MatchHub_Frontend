@@ -9,7 +9,7 @@ export default function BuscarPage() {
   const { 
     searchQuery, setSearchQuery, 
     players, isLoading,
-    availableGames, 
+    availableGames, isLoadingGames,
     selectedGames, selectedStyles, selectedDays,
     toggleFilter
   } = useSearch();
@@ -35,9 +35,9 @@ export default function BuscarPage() {
           />
         </div>
 
-        <FilterDropdown 
+       <FilterDropdown 
           availableGames={availableGames}
-          isLoadingGames={isLoading} 
+          isLoadingGames={isLoadingGames} 
           selectedGames={selectedGames}
           selectedStyles={selectedStyles}
           selectedDays={selectedDays}
