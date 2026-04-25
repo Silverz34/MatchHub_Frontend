@@ -120,7 +120,7 @@ export default function PerfilPage() {
                 ))}
               </select>
             </div>
-            {/* SELECT PARA REGIÓN (ENUM DB) */}
+       
             <div>
               <label className="block font-bold text-sm mb-2">Región</label>
               <select 
@@ -167,13 +167,14 @@ export default function PerfilPage() {
                 </button>
               ))}
             </div>
-            {/* Si el array está vacío (cargando o falló), mostramos un mensajito */}
+
+
             {availableGames.length === 0 && (
               <p className="text-sm text-gray-500 italic">No hay juegos disponibles en el catálogo.</p>
             )}
           </div>
 
-          {/* PREFERENCIAS (Desde la API) */}
+          {/* PREFERENCIAS */}
           <div className="mb-10">
             <h4 className="border-l-4 border-[#FF6B00] pl-3 font-bold mb-4">Etiquetas de Estilo</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
